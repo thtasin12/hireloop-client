@@ -1,21 +1,20 @@
 import { betterAuth } from "better-auth";
 import { MongoClient } from "mongodb";
-import { mongodbAdapter } from "@better-auth/mongo-adapter";
-const client = new MongoClient("mongodb://localhost:27017/database");
+import { mongodbAdapter } from "better-auth/adapters/mongodb";
+
+const client = new MongoClient(process.env.MONGODB_URI ?? "mongodb://localhost:27017/hireloop");
 const db = client.db();
 
 export const auth = betterAuth({
   emailAndPassword: {
     enabled: true,
+    minPasswordLength: 8,
   },
   socialProviders: {
     github: {
-      enabled: true,
       clientId: process.env.GITHUB_CLIENT_ID as string,
       clientSecret: process.env.GITHUB_CLIENT_SECRET as string,
-    }
+    },
   },
-  database: mongodbAdapter(db, {
-    client,
-  }),
+  database: mongodbAdapter(db, { client }),
 });
